@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% block page_heading %}Panel general{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><h1>Resumen de seguridad</h1><p>Vista general de los activos y hallazgos registrados en el sistema.</p></div><a class="btn primary" href="{{ url_for('scan') }}">＋ Nuevo escaneo</a></div>
+<div class="stat-grid">
+ <div class="stat-card"><div class="stat-top"><span>Equipos registrados</span><span class="stat-icon blue">▣</span></div><strong>{{ assets_count }}</strong><small>Activos bajo seguimiento</small></div>
+ <div class="stat-card"><div class="stat-top"><span>Puertos abiertos</span><span class="stat-icon cyan">⌁</span></div><strong>{{ open_ports }}</strong><small>En el último escaneo de cada equipo</small></div>
+ <div class="stat-card"><div class="stat-top"><span>Alertas pendientes</span><span class="stat-icon red">⚑</span></div><strong>{{ pending }}</strong><small>Requieren revisión del administrador</small></div>
+ <div class="stat-card"><div class="stat-top"><span>Emisión promedio</span><span class="stat-icon purple">◷</span></div><strong>{{ "%.3f"|format(avg_delay) }}<small class="unit"> seg</small></strong><small>Detección hasta creación de alerta</small></div>
+</div>
+<div class="two-col">
+ <div class="panel"><div class="panel-head"><div><h3>Escaneos recientes</h3><p>Últimas comprobaciones realizadas</p></div><a href="{{ url_for('scan') }}">Ver escáner →</a></div>
+ {% if latest_scans %}<div class="table-wrap"><table><thead><tr><th>Equipo</th><th>Fecha</th><th>Puertos</th><th>Duración</th></tr></thead><tbody>{% for s in latest_scans %}<tr><td><b>{{ s.asset_name }}</b><small class="cell-sub">{{ s.ip }}</small></td><td>{{ s.scanned_at }}</td><td><span class="count-pill">{{ s.open_count }}</span></td><td>{{ "%.2f"|format(s.duration_seconds) }} s</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><span>⌁</span><b>Aún no hay escaneos</b><p>Registra un equipo y ejecuta tu primera comprobación.</p><a href="{{ url_for('assets') }}">Registrar equipo →</a></div>{% endif %}</div>
+ <div class="panel"><div class="panel-head"><div><h3>Alertas recientes</h3><p>Puertos riesgosos identificados</p></div><a href="{{ url_for('alerts') }}">Ver todas →</a></div>
+ {% if recent %}<div class="alert-list">{% for a in recent %}<div class="alert-item"><span class="alert-symbol">!</span><div class="alert-info"><b>{{ a.service }} · Puerto {{ a.port }}</b><small>{{ a.asset_name }} ({{ a.ip }})</small></div><span class="severity {{ 'high' if a.severity=='Alta' else 'low' }}">{{ a.severity }}</span></div>{% endfor %}</div>{% else %}<div class="empty"><span>✓</span><b>Sin alertas registradas</b><p>Las alertas aparecerán cuando se detecten puertos riesgosos abiertos.</p></div>{% endif %}</div>
+</div>
+<div class="notice"><span>ⓘ</span><div><b>Alcance del MVP</b><p>El sistema realiza escaneos bajo demanda sobre equipos registrados. Solo escanea direcciones IPv4 privadas o localhost y requiere autorización del responsable de la red.</p></div></div>
+{% endblock %}

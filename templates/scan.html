@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block page_heading %}Escáner de puertos{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><h1>Escaneo de red</h1><p>Comprueba qué puertos TCP están abiertos en un activo registrado.</p></div><span class="form-tag">CU-04</span></div>
+<div class="scan-layout"><div class="panel scan-panel"><div class="scan-graphic">⌁</div><h3>Iniciar comprobación</h3><p class="muted">Selecciona un equipo para comprobar la lista fija de puertos del MVP.</p>
+{% if assets %}<form method="post"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><label>Equipo a escanear</label><select name="asset_id" required>{% for a in assets %}<option value="{{ a.id }}">{{ a.name }} — {{ a.ip }}</option>{% endfor %}</select><button class="btn primary full scan-button" type="submit" onclick="this.disabled=true;this.innerHTML='Escaneando…'">Iniciar escaneo <span>→</span></button></form>{% else %}<div class="inline-warning">Primero debes <a href="{{ url_for('assets') }}">registrar un equipo</a>.</div>{% endif %}
+<div class="scan-note"><b>Uso autorizado</b><br>Ejecuta escaneos únicamente sobre activos propios o con autorización expresa. El escaneo puede tardar unos segundos.</div></div>
+<div class="panel ports-panel"><div class="panel-head"><div><h3>Puertos incluidos</h3><p>Lista fija definida para el MVP</p></div><span class="count-pill">{{ ports|length }}</span></div>
+{% for port,info in ports.items() %}<div class="port-row"><div><b>{{ port }}</b><span>{{ info[0] }}</span></div>{% if info[1] %}<span class="severity high">Riesgoso</span>{% else %}<span class="severity neutral">Revisión</span>{% endif %}</div>{% endfor %}
+</div></div>
+{% endblock %}

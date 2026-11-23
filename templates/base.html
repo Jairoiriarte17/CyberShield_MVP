@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CyberShield{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+{% if session.get('user_id') %}
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">⌑</span><span>Cyber<span class="brand-accent">Shield</span><small>SECURITY CONSOLE</small></span></a>
+    <div class="side-label">MENÚ PRINCIPAL</div>
+    <nav>
+      <a class="{{ 'active' if request.endpoint=='dashboard' else '' }}" href="{{ url_for('dashboard') }}"><span>▦</span> Panel general</a>
+      <a class="{{ 'active' if request.endpoint=='assets' else '' }}" href="{{ url_for('assets') }}"><span>▣</span> Equipos protegidos</a>
+      <a class="{{ 'active' if request.endpoint in ['scan','scan_result'] else '' }}" href="{{ url_for('scan') }}"><span>⌁</span> Escáner de puertos</a>
+      <a class="{{ 'active' if request.endpoint=='alerts' else '' }}" href="{{ url_for('alerts') }}"><span>⚑</span> Alertas de seguridad</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="online-dot"></div><div><b>Sistema activo</b><small>Monitoreo bajo demanda</small></div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><span class="eyebrow">CENTRO DE OPERACIONES</span><h2>{% block page_heading %}Panel general{% endblock %}</h2></div>
+      <div class="user-chip"><span class="avatar">A</span><span><b>{{ session.get('username','admin') }}</b><small>Administrador</small></span>
+        <form method="post" action="{{ url_for('logout') }}"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="logout" title="Cerrar sesión">↗</button></form>
+      </div>
+    </header>
+    <section class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer>CyberShield MVP <span>•</span> Proyecto académico · Estructura de Datos II</footer>
+  </main>
+</div>
+{% else %}
+{% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}{% for category,message in messages %}<div class="flash {{ category }} login-flash">{{ message }}</div>{% endfor %}{% endif %}{% endwith %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body></html>

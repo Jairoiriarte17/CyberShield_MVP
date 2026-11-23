@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block page_heading %}Resultado del escaneo{% endblock %}
+{% block content %}
+<div class="welcome-row"><div><h1>Resultado de comprobación</h1><p>{{ scan.asset_name }} · {{ scan.ip }} · {{ scan.scanned_at }}</p></div><a class="btn secondary" href="{{ url_for('scan') }}">Nuevo escaneo</a></div>
+<div class="result-summary"><div><span>Puertos abiertos</span><strong>{{ results|length }}</strong></div><div><span>Duración</span><strong>{{ "%.2f"|format(scan.duration_seconds) }} s</strong></div><div><span>Alertas generadas</span><strong>{{ results|selectattr('is_risky')|list|length }}</strong></div></div>
+<div class="panel"><div class="panel-head"><div><h3>Puertos detectados</h3><p>Solo se muestran los puertos que respondieron a la conexión TCP.</p></div></div>
+{% if results %}<div class="table-wrap"><table><thead><tr><th>Puerto</th><th>Servicio</th><th>Evaluación</th><th>Estado</th></tr></thead><tbody>{% for p in results %}<tr><td><b>{{ p.port }}</b></td><td>{{ p.service }}</td><td>{% if p.is_risky %}<span class="severity high">Riesgoso</span>{% else %}<span class="severity neutral">Revisión</span>{% endif %}</td><td><span class="open-status">● Abierto</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty"><span>✓</span><b>No se encontraron puertos abiertos</b><p>Ninguno de los puertos de la lista respondió a la comprobación.</p></div>{% endif %}</div>
+{% endblock %}
